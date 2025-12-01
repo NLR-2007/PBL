@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student PBL Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- firebase.js file -->
+  <script src="js/firebase.js"></script>
+
+  <!-- NAVBAR -->
+  <nav class="bg-white shadow-md fixed top-0 left-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+      <h1 class="text-2xl font-bold text-blue-600">Student PBL</h1>
+
+      <!-- Desktop Menu -->
+      <div class="space-x-6 hidden md:flex items-center">
+        <a href="#projects" class="font-semibold hover:text-blue-600">Projects</a>
+        <a href="upload.html" class="font-semibold hover:text-blue-600">Upload</a>
+        <a href="dashboard.html" class="font-semibold hover:text-blue-600">Dashboard</a>
+        <a href="#about" class="font-semibold hover:text-blue-600">About</a>
+
+        <!-- Before Login -->
+        <div id="navButtons" class="flex items-center space-x-4">
+          <button onclick="openLogin()" class="font-semibold hover:text-blue-600">Login</button>
+          <button onclick="openRegister()" class="font-semibold hover:text-blue-600">Register</button>
+        </div>
+
+        <!-- After Login -->
+        <div id="welcomeSection" class="hidden items-center space-x-4">
+          <span id="welcomeText" class="font-semibold text-blue-600"></span>
+          <button onclick="logout()" class="px-4 py-1 bg-red-500 text-white rounded">Logout</button>
+        </div>
+
+      </div>
+
+      <!-- MOBILE BUTTON -->
+      <button onclick="toggleMenu()" class="md:hidden text-blue-600 text-2xl">☰</button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden bg-white shadow-md p-4 md:hidden">
+      <a href="#projects" class="block py-2 font-semibold hover:text-blue-600">Projects</a>
+      <a href="upload.html" class="block py-2 font-semibold hover:text-blue-600">Upload</a>
+      <a href="dashboard.html" class="block py-2 font-semibold hover:text-blue-600">Dashboard</a>
+      <a href="#about" class="block py-2 font-semibold hover:text-blue-600">About</a>
+
+      <hr class="my-2" />
+
+      <button onclick="openLogin()" class="w-full py-2 font-semibold hover:text-blue-600">Login</button>
+      <button onclick="openRegister()" class="w-full py-2 font-semibold hover:text-blue-600">Register</button>
+    </div>
+  </nav>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("mobileMenu").classList.toggle("hidden");
+    }
+  </script>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 w-80 rounded shadow">
+      <h2 class="text-xl font-bold mb-4">Login</h2>
+      <input id="loginEmail" type="email" placeholder="Email" class="w-full border p-2 mb-3">
+      <input id="loginPassword" type="password" placeholder="Password" class="w-full border p-2 mb-3">
+
+      <button onclick="emailLogin()" class="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+
+      <button onclick="googleLogin()" class="w-full bg-red-500 text-white py-2 rounded mt-3">Sign in with Google</button>
+
+      <button onclick="closeLogin()" class="mt-3 w-full text-blue-600">Cancel</button>
+    </div>
+  </div>
+<!-- REGISTER MODAL -->
+<div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+  <div class="bg-white p-6 w-96 rounded shadow">
+    <h2 class="text-xl font-bold mb-4">Create Account</h2>
+
+    <input id="regFirstName" type="text" placeholder="First Name" class="w-full border p-2 mb-2">
+    <input id="regLastName" type="text" placeholder="Last Name" class="w-full border p-2 mb-2">
+    <input id="regAge" type="number" placeholder="Age" class="w-full border p-2 mb-2">
+    <input id="regStudying" type="text" placeholder="Studying (Class)" class="w-full border p-2 mb-2">
+    <input id="regInterest" type="text" placeholder="Interested In" class="w-full border p-2 mb-2">
+
+    <input id="registerEmail" type="email" placeholder="Email" class="w-full border p-2 mb-2">
+    <input id="registerPassword" type="password" placeholder="Password" class="w-full border p-2 mb-3">
+
+    <button onclick="register()" class="w-full bg-blue-600 text-white py-2 rounded">Register</button>
+    <button onclick="closeRegister()" class="mt-3 w-full text-blue-600">Cancel</button>
+  </div>
+</div>
+
+
+  <!-- HERO SECTION -->
+  <section class="pt-28 bg-blue-600 text-white text-center px-6 pb-20">
+    <h2 class="text-4xl md:text-5xl font-bold">Discover, Create & Share Projects</h2>
+    <p class="mt-3 text-lg md:text-xl max-w-2xl mx-auto">
+      Learn by doing! Browse projects inspired by real science and Wikipedia knowledge.
+    </p>
+
+    <a href="project.html" class="mt-6 inline-block bg-white text-blue-600 font-bold px-8 py-3 rounded-full shadow-md hover:bg-gray-100">
+      Explore Projects
+    </a>
+  </section>
+
+  <!-- MOTIVATION -->
+  <section id="quoteSection" class="hidden text-center py-8 bg-blue-50">
+    <h3 class="text-2xl font-bold text-blue-600">Motivation for You</h3>
+    <p id="quoteText" class="mt-3 text-lg text-gray-700"></p>
+  </section>
+
+  <!-- TRENDING PROJECTS -->
+  <section id="projects" class="max-w-7xl mx-auto px-6 py-16">
+    <h3 class="text-3xl font-bold text-center mb-10 text-blue-600">Trending Projects</h3>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- CARD 1 -->
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1615933016626-f43a03744a82?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHdhdGVyJTIwbGV2ZWwlMjBpbmRpY2F0b3J8ZW58MHx8MHx8fDA%3D" class="w-full h-48 object-cover">
+        <div class="p-5">
+          <h4 class="font-bold text-xl">Water Level Indicator</h4>
+          <p class="text-gray-600 mt-2">Simple electronics project measuring water levels.</p>
+          <a href="https://en.wikipedia.org/wiki/Water_level" target="_blank" class="text-blue-600 font-semibold mt-3 block">Learn on Wikipedia →</a>
+        </div>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1697180047373-1de161d3656a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8dmFsY2Fub3xlbnwwfHwwfHx8MA%3D%3D" class="w-full h-48 object-cover">
+        <div class="p-5">
+          <h4 class="font-bold text-xl">Volcano Experiment</h4>
+          <p class="text-gray-600 mt-2">Fun chemical reaction using vinegar + baking soda.</p>
+          <a href="https://en.wikipedia.org/wiki/Volcano" target="_blank" class="text-blue-600 font-semibold mt-3 block">Learn on Wikipedia →</a>
+        </div>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <img src="https://plus.unsplash.com/premium_photo-1661845609789-635c5e35c4ba?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c21hcnQlMjBpcnJpZ2F0aW9ufGVufDB8fDB8fHww" class="w-full h-48 object-cover">
+        <div class="p-5">
+          <h4 class="font-bold text-xl">Smart Irrigation System</h4>
+          <p class="text-gray-600 mt-2">Automation using soil moisture sensors.</p>
+          <a href="https://en.wikipedia.org/wiki/Irrigation" target="_blank" class="text-blue-600 font-semibold mt-3 block">Learn on Wikipedia →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- UPLOAD SECTION -->
+  <section id="upload" class="bg-blue-50 py-16 px-6 text-center">
+    <h3 class="text-3xl font-bold text-blue-600">Upload Your Project</h3>
+    <p class="mt-3 text-gray-700">Submit your Google Drive link and share your creativity.</p>
+
+    <a href="upload.html" class="mt-6 inline-block bg-blue-600 text-white font-bold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700">
+      Upload Now
+    </a>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="max-w-6xl mx-auto px-6 py-20 text-center">
+    <h3 class="text-3xl font-bold text-blue-600">About This Platform</h3>
+    <p class="mt-6 text-lg text-gray-700 max-w-3xl mx-auto">
+      Inspired by
+      <a href="https://en.wikipedia.org/wiki/Project-based_learning" target="_blank" class="text-blue-600 underline">
+        Project-Based Learning
+      </a>,
+      this platform helps students explore real-world STEM ideas and hands-on innovation.
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-blue-600 text-white text-center py-5">
+    © 2025 Student PBL Platform. All Rights Reserved.<br>
+    <b>Developed by NLR GROUP OF COMPANY</b>
+  </footer>
+
+  <!-- LOGIN/AUTH SCRIPT -->
+  <script>
+    const quotes = [
+      "Believe you can and you're halfway there.",
+      "Success is small efforts repeated daily.",
+      "Your only limit is your mind.",
+      "Dream big. Start small. Act now.",
+      "Great things never come from comfort zones."
+    ];
+
+    function openLogin() {
+      document.getElementById("loginModal").classList.remove("hidden");
+    }
+    function closeLogin() {
+      document.getElementById("loginModal").classList.add("hidden");
+    }
+    function openRegister() {
+      document.getElementById("registerModal").classList.remove("hidden");
+    }
+    function closeRegister() {
+      document.getElementById("registerModal").classList.add("hidden");
+    }
+
+    // EMAIL LOGIN
+    function emailLogin() {
+      const email = document.getElementById("loginEmail").value;
+      const pass = document.getElementById("loginPassword").value;
+
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => { closeLogin(); })
+        .catch(err => alert(err.message));
+    }
+
+    // EMAIL REGISTER
+    function emailRegister() {
+      const email = document.getElementById("registerEmail").value;
+      const pass = document.getElementById("registerPassword").value;
+
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(() => {
+          closeRegister();
+          alert("Account Created Successfully!");
+        })
+        .catch(err => alert(err.message));
+    }
+
+    // GOOGLE LOGIN
+    function googleLogin() {
+      auth.signInWithPopup(googleProvider)
+        .then(() => closeLogin())
+        .catch(err => alert(err.message));
+    }
+
+    // LOGOUT
+    function logout() {
+      auth.signOut();
+    }
+
+    // AUTH STATE CHANGES UI
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("navButtons").style.display = "none";
+        document.getElementById("welcomeSection").style.display = "flex";
+
+        document.getElementById("quoteSection").classList.remove("hidden");
+
+        document.getElementById("welcomeText").innerText =
+          "Welcome, " + (user.displayName || user.email);
+
+        document.getElementById("quoteText").innerText =
+          quotes[Math.floor(Math.random() * quotes.length)];
+      } else {
+        document.getElementById("navButtons").style.display = "flex";
+        document.getElementById("welcomeSection").style.display = "none";
+        document.getElementById("quoteSection").classList.add("hidden");
+      }
+    });
+  </script>
+
+</body>
+</html>

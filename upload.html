@@ -1,0 +1,65 @@
+<!-- upload.html -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Upload Project</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-gray-100">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+
+<nav class="bg-white shadow p-4"><div class="max-w-6xl mx-auto"><a href="project.html" class="text-lg font-bold text-blue-600">Student PBL</a></div></nav>
+
+<main class="max-w-3xl mx-auto p-6 pt-20">
+  <div class="bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-bold text-blue-600">Upload Your Project</h2>
+
+    <label class="block mt-4">Title</label>
+    <input id="title" class="w-full border p-2 rounded"/>
+
+    <label class="block mt-2">Description</label>
+    <textarea id="description" class="w-full border p-2 rounded"></textarea>
+
+    <label class="block mt-2">Category</label>
+    <select id="category" class="w-full border p-2 rounded">
+      <option>Science</option><option>Electronics</option><option>Robotics</option><option>DIY Model</option>
+    </select>
+
+    <label class="block mt-2">Google Drive Link</label>
+    <input id="driveLink" class="w-full border p-2 rounded" />
+
+    <button onclick="submitProject()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+
+    <div id="success" class="hidden mt-4 text-green-600">Uploaded successfully!</div>
+  </div>
+</main>
+
+<script>
+auth.onAuthStateChanged(user=>{
+  if(!user){ alert('Login first'); location.href='index.html'; }
+});
+
+async function submitProject(){
+  const user = auth.currentUser;
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const driveLink = document.getElementById('driveLink').value.trim();
+  const category = document.getElementById('category').value;
+
+  if(!title||!description||!driveLink){ alert('Fill fields'); return; }
+  if(!driveLink.includes('drive.google.com')){ if(!confirm('Drive link does not include drive.google.com — continue?')) return; }
+
+  try {
+    const docRef = await db.collection('projects').add({
+      title, description, driveLink, category,
+      userId: user.uid, email: user.email, timestamp: Date.now()
+    });
+    document.getElementById('success').classList.remove('hidden');
+    setTimeout(()=> location.href='dashboard.html', 1000);
+  } catch(err){ alert('Upload failed: '+err.message); console.error(err); }
+}
+</script>
+</body>
+</html>

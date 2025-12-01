@@ -1,0 +1,61 @@
+<!-- edit.html -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Edit Project</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-gray-100">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+
+<nav class="bg-white p-4 shadow"><div class="max-w-6xl mx-auto"><a href="dashboard.html" class="text-blue-600 font-bold">← Back</a></div></nav>
+
+<main class="max-w-3xl mx-auto p-6 pt-12">
+  <div class="bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-bold">Edit Project</h2>
+    <label class="block mt-3">Title</label>
+    <input id="title" class="w-full border p-2 rounded"/>
+    <label class="block mt-2">Description</label>
+    <textarea id="description" class="w-full border p-2 rounded"></textarea>
+    <label class="block mt-2">Category</label>
+    <input id="category" class="w-full border p-2 rounded"/>
+    <label class="block mt-2">Drive Link</label>
+    <input id="driveLink" class="w-full border p-2 rounded"/>
+    <button onclick="save()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
+  </div>
+</main>
+
+<script>
+function getParam(n){ return new URL(location.href).searchParams.get(n); }
+const id = getParam('id');
+if(!id){ alert('Missing id'); location.href='dashboard.html'; }
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){ alert('Login first'); location.href='index.html'; return; }
+  // load doc and ensure owner
+  const doc = await db.collection('projects').doc(id).get();
+  if(!doc.exists){ alert('Project not found'); location.href='dashboard.html'; return; }
+  const d = doc.data();
+  if(d.userId !== user.uid){ alert('Not authorized'); location.href='dashboard.html'; return; }
+  document.getElementById('title').value = d.title || '';
+  document.getElementById('description').value = d.description || '';
+  document.getElementById('category').value = d.category || '';
+  document.getElementById('driveLink').value = d.driveLink || '';
+});
+
+async function save(){
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const category = document.getElementById('category').value.trim();
+  const driveLink = document.getElementById('driveLink').value.trim();
+  if(!title||!description||!driveLink){ alert('Fill all'); return; }
+  try{
+    await db.collection('projects').doc(id).update({ title, description, category, driveLink, updatedAt: Date.now() });
+    alert('Saved'); location.href='dashboard.html';
+  }catch(err){ alert('Save failed: '+err.message); console.error(err); }
+}
+</script>
+
+</body>
+</html>

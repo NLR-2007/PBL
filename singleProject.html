@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Details - Student PBL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white shadow-md fixed top-0 left-0 w-full z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="project.html" class="text-2xl font-bold text-blue-600">Student PBL</a>
+      <div class="space-x-6">
+        <a href="index.html" class="text-gray-600 hover:text-blue-600">Home</a>
+        <a href="project.html" class="text-gray-600 hover:text-blue-600">Projects</a>
+        <a href="dashboard.html" class="text-gray-600 hover:text-blue-600">Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-6 pt-32 pb-16">
+    <div id="content" class="bg-white shadow p-6 rounded-lg">
+      <p class="text-center text-gray-500 text-lg py-20">Loading project…</p>
+    </div>
+  </main>
+
+  <footer class="bg-blue-600 text-white text-center py-4">
+    © 2025 Student PBL Platform
+  </footer>
+
+<script>
+// GET ID from URL
+function getParam(name) {
+  return new URL(window.location.href).searchParams.get(name);
+}
+
+async function loadProject() {
+  const id = getParam("id");
+  const box = document.getElementById("content");
+
+  if (!id) {
+    box.innerHTML = `<p class="text-red-500 text-center py-20">
+      No project id found in URL.  
+      Use: <b>?id=project-001</b>
+    </p>`;
+    return;
+  }
+
+  try {
+    const res = await fetch("projects.json");
+    const data = await res.json();
+
+    const p = data.find(x => x.id === id);
+
+    if (!p) {
+      box.innerHTML = `<p class="text-red-500 text-center py-20">
+        Project not found.
+      </p>`;
+      return;
+    }
+
+    // Render project
+    box.innerHTML = `
+      <img src="${p.image}" class="w-full h-64 object-cover rounded-lg shadow mb-6" />
+
+      <h1 class="text-3xl font-bold text-blue-600">${p.title}</h1>
+      <p class="mt-2 text-gray-600">${p.summary}</p>
+
+      <p class="mt-3 text-sm text-gray-700">
+        <b>Age Group:</b> ${p.age} <br>
+        <b>Category:</b> ${p.category} <br>
+        <b>Difficulty:</b> ${p.difficulty} <br>
+        <b>Time Required:</b> ${p.time}
+      </p>
+
+      <hr class="my-6">
+
+      <h2 class="text-xl font-semibold">Objectives</h2>
+      <ul class="list-disc text-gray-700 pl-6 mt-2">
+        ${p.objectives.map(o => `<li>${o}</li>`).join("")}
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-6">Materials Required</h2>
+      <ul class="list-disc text-gray-700 pl-6 mt-2">
+        ${p.materials.map(m => `<li>${m}</li>`).join("")}
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-6">Steps to Follow</h2>
+      <ol class="list-decimal text-gray-700 pl-6 mt-2">
+        ${p.steps.map(s => `<li>${s}</li>`).join("")}
+      </ol>
+
+      <h2 class="text-xl font-semibold mt-6">Expected Output</h2>
+      <p class="text-gray-700 mt-2">${p.expectedOutput}</p>
+
+      <h2 class="text-xl font-semibold mt-6">Conclusion</h2>
+      <p class="text-gray-700 mt-2">${p.conclusion}</p>
+
+      <h2 class="text-xl font-semibold mt-6">Engineering Notes</h2>
+      <p class="text-gray-700 mt-2">${p.engineeringNotes}</p>
+
+      <h2 class="text-xl font-semibold mt-6">Applications</h2>
+      <ul class="list-disc pl-6 mt-2">
+        ${p.applications.map(a => `<li>${a}</li>`).join("")}
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-6">Future Scope</h2>
+      <ul class="list-disc pl-6 mt-2">
+        ${p.futureScope.map(f => `<li>${f}</li>`).join("")}
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-6">Reference</h2>
+      <a href="${p.references}" target="_blank" class="text-blue-600 underline">
+        ${p.references}
+      </a>
+
+      <div class="mt-8">
+        <a href="project.html"
+           class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+           ← Back to All Projects
+        </a>
+      </div>
+    `;
+  } catch (err) {
+    box.innerHTML = `<p class="text-red-500 text-center py-20">
+      Error loading project.
+    </p>`;
+  }
+}
+
+loadProject();
+</script>
+
+</body>
+</html>
